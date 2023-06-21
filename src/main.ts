@@ -6,11 +6,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   // app.setGlobalPrefix('api');
-  app.enableCors({
-    origin: ['https://portal-brainon24.vercel.app'],
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-    credentials: true,
-  });
+  app.enableCors();
 
   app.useGlobalPipes(
     new ValidationPipe({
@@ -23,10 +19,8 @@ async function bootstrap() {
     }),
   );
 
-  const PORT = process.env.PORT || 8080;
+  await app.listen(process.env.PORT || 8080);
 
-  await app.listen(PORT);
-
-  console.log('🚀 Server running on port', PORT);
+  console.log('🚀 Server running on port', process.env.PORT || 8080);
 }
 bootstrap();
