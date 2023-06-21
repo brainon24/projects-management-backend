@@ -10,7 +10,7 @@ async function bootstrap() {
   const corsOptions: CorsOptions = {
     origin: '*', // Permitir todas las solicitudes CORS
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'x-token'],
   };
 
   app.enableCors(corsOptions);
