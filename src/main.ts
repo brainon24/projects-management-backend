@@ -7,7 +7,7 @@ async function bootstrap() {
 
   // app.setGlobalPrefix('api');
   app.enableCors({
-    origin: '*',
+    origin: ['https://portal-brainon24.vercel.app'],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
   });
