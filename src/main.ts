@@ -8,7 +8,7 @@ async function bootstrap() {
 
   // app.setGlobalPrefix('api');
   const corsOptions: CorsOptions = {
-    origin: 'https://portal-brainon24.vercel.app',
+    origin: '*',
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
     allowedHeaders: ['Content-Type', 'Authorization', 'x-token'],
   };
