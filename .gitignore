@@ -37,4 +37,3 @@ lerna-debug.log*
 # MONGO and Environment Variable file
 /mongo
 .env
-.vercel
