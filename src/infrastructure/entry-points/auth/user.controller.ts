@@ -1,14 +1,19 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Put } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+} from '@nestjs/common';
 import { UserService } from './user.service';
 import { IUserDBRepository } from './user.repository.types';
 import { CreateUserDto } from './dto/user.dto';
 
 @Controller('/user')
 export class UserController implements IUserDBRepository {
-
-  constructor(
-    private readonly userService: UserService
-  ) {}
+  constructor(private readonly userService: UserService) {}
 
   @Post('/create-user')
   create(@Body() createUserDto: CreateUserDto) {
@@ -16,24 +21,29 @@ export class UserController implements IUserDBRepository {
   }
 
   @Get('/findById/:id')
-  findById(@Param('id') id: string){    
+  findById(@Param('id') id: string) {
     return this.userService.findById(id);
   }
 
   @Post('/findByName')
-  findByName(@Body() payload: any){
+  findByName(@Body() payload: any) {
     const { name, lastName } = payload;
     return this.userService.findByName(name, lastName);
   }
 
   @Post('/findByEmail')
-  findByEmail(@Body() payload: any){
+  findByEmail(@Body() payload: any) {
     const { email } = payload;
     return this.userService.findByEmail(email);
   }
 
+  @Get('/findByPhone/:phone')
+  findByPhone(@Param('phone') phone: any) {
+    return this.userService.findByPhone(phone);
+  }
+
   @Get('/findAll')
-  findAll(){
+  findAll() {
     return this.userService.findAll();
   }
 

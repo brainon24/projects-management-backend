@@ -183,6 +183,30 @@ export class UserDBRepository implements IUserDBRepository {
     }
   }
 
+  async findByPhone(phone: string): Promise<User> {
+    try {
+      const user: any = await this.userModel.findOne({ phone });
+
+      if (!user) {
+        throw new NotFoundException(
+          'No se encontró ningún usuario por ese correo electrónico.',
+        );
+      }
+
+      let newObjectUser = user;
+      newObjectUser = newObjectUser.toObject();
+      delete newObjectUser.password;
+      delete newObjectUser.__v;
+      delete newObjectUser.updatedAt;
+
+      return newObjectUser;
+    } catch (error) {
+      throw new NotFoundException(
+        'No se encontró ningún usuario por ese correo electrónico.',
+      );
+    }
+  }
+
   /**
    * Find a User
    * @return users found - The users found
