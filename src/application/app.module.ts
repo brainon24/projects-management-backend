@@ -8,6 +8,7 @@ import { ConfigModule } from '@nestjs/config';
 import config from './config';
 import { ProjectModule } from '../infrastructure/entry-points/project/project.module';
 import { CommentaryModule } from '../infrastructure/entry-points/commentary/commentary.module';
+import { MessageModule } from 'src/infrastructure/entry-points/message/message.module';
 
 @Module({
   imports: [
@@ -18,13 +19,14 @@ import { CommentaryModule } from '../infrastructure/entry-points/commentary/comm
     BusinessModule,
     ProjectModule,
     CommentaryModule,
-    
+    MessageModule,
+
     ConfigModule.forRoot({
       envFilePath: '.env',
       load: [config],
-      isGlobal: true
+      isGlobal: true,
     }),
-    ],
-  controllers: [AppController]
+  ],
+  controllers: [AppController],
 })
 export class AppModule {}

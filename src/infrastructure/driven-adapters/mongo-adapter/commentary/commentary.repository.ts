@@ -40,12 +40,12 @@ export class CommentaryDBRepository implements ICommentaryDBRepository {
     params: QueryParamsDto,
   ): Promise<any[]> {
     try {
-      const { limit, offset = 0 } = params;
+      // const { limit, offset = 0 } = params;
 
       const commentaries = await this.commentaryModel
         .find({ projectId })
-        .limit(limit)
-        .skip(offset)
+        // .limit(limit)
+        // .skip(offset)
         .sort({
           createdAt: -1,
         })

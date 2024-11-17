@@ -7,10 +7,7 @@ import { Schema } from 'mongoose';
 
 @Injectable()
 export class BusinessService implements IBusinessDBRepository {
-
-  constructor(
-    private readonly businessRepository: BusinessDBRepository
-  ){}
+  constructor(private readonly businessRepository: BusinessDBRepository) {}
 
   create(createBusinessDto: CreateBusinessDto) {
     return this.businessRepository.create(createBusinessDto);
@@ -29,7 +26,6 @@ export class BusinessService implements IBusinessDBRepository {
   }
 
   update(businessId: string, businessName: string): Promise<Business> {
-    return this.businessRepository.update(businessId, businessName)
+    return this.businessRepository.update(businessId, businessName);
   }
-
 }

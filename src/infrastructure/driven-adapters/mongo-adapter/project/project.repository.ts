@@ -36,12 +36,12 @@ export class ProjectDBRepository implements IProjectDBRepository {
    */
   async findAll(params: QueryParamsDto): Promise<Project[]> {
     try {
-      const { limit = 10, offset = 0 } = params;
+      // const { limit = 10, offset = 0 } = params;
 
       const projects = await this.projectModel
         .find()
-        .limit(limit)
-        .skip(offset)
+        // .limit(limit)
+        // .skip(offset)
         .sort({
           createdAt: -1,
         })

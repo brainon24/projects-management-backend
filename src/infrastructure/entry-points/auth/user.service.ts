@@ -32,6 +32,10 @@ export class UserService implements IUserDBRepository {
     return this.user.findAll();
   }
 
+  async findByBusinessId(businessId: string): Promise<User[]> {
+    return await this.user.findByBusinessId(businessId);
+  }
+
   findAllByRole(role: string): Promise<User | User[]> {
     return this.user.findAllByRole(role);
   }

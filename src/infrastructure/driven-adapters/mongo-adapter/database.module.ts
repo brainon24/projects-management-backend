@@ -10,6 +10,8 @@ import { ProjectSchema } from './project/project.schema';
 import { ProjectDBRepository } from './project/project.repository';
 import { CommentarySchema } from './commentary/commentary.schema';
 import { CommentaryDBRepository } from './commentary/commentary.repository';
+import { MessageSchema } from './message/message.schema';
+import { MessageDBRepository } from './message/message.repository';
 
 @Global()
 @Module({
@@ -18,30 +20,47 @@ import { CommentaryDBRepository } from './commentary/commentary.repository';
       useFactory: (configService: ConfigType<typeof config>) => {
         const { url } = configService.mongo;
 
-        return { uri: url }
+        return { uri: url };
       },
-      inject: [config.KEY]
+      inject: [config.KEY],
     }),
     MongooseModule.forFeature([
       {
         name: 'User',
-        schema: UserSchema
+        schema: UserSchema,
       },
       {
         name: 'Business',
-        schema: BusinessSchema
+        schema: BusinessSchema,
       },
       {
         name: 'Project',
-        schema: ProjectSchema
+        schema: ProjectSchema,
       },
       {
         name: 'Commentary',
-        schema: CommentarySchema
-      }
-    ])
+        schema: CommentarySchema,
+      },
+      {
+        name: 'Message',
+        schema: MessageSchema,
+      },
+    ]),
   ],
-  providers: [ UserDBRepository, BusinessDBRepository, ProjectDBRepository, CommentaryDBRepository ],
-  exports: [ MongooseModule, UserDBRepository, BusinessDBRepository, ProjectDBRepository, CommentaryDBRepository ]
+  providers: [
+    UserDBRepository,
+    BusinessDBRepository,
+    ProjectDBRepository,
+    CommentaryDBRepository,
+    MessageDBRepository,
+  ],
+  exports: [
+    MongooseModule,
+    UserDBRepository,
+    BusinessDBRepository,
+    ProjectDBRepository,
+    CommentaryDBRepository,
+    MessageDBRepository,
+  ],
 })
 export class DatabaseModule {}

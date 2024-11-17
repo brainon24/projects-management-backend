@@ -207,6 +207,18 @@ export class UserDBRepository implements IUserDBRepository {
     }
   }
 
+  async findByBusinessId(businessId: string): Promise<User[]> {
+    try {
+      const users = await this.userModel.find({ businessId });
+
+      return users;
+    } catch (error) {
+      throw new NotFoundException(
+        'No se encontró ningún usuario por ese correo electrónico.',
+      );
+    }
+  }
+
   /**
    * Find a User
    * @return users found - The users found

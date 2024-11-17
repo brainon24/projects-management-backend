@@ -42,6 +42,11 @@ export class UserController implements IUserDBRepository {
     return this.userService.findByPhone(phone);
   }
 
+  @Get('/findByBusinessId/:id')
+  findByBusinessId(@Param('id') id: any) {
+    return this.userService.findByBusinessId(id);
+  }
+
   @Get('/findAll')
   findAll() {
     return this.userService.findAll();
