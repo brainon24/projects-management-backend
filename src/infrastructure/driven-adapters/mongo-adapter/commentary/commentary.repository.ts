@@ -20,11 +20,9 @@ export class CommentaryDBRepository implements ICommentaryDBRepository {
    * @param payload
    * @return a Promise of Commentary
    */
-  async create(payload: CreateCommentaryDto): Promise<Commentary> {
+  async create(payload: CreateCommentaryDto): Promise<void> {
     try {
-      const newCommentary = await new this.commentaryModel(payload).save();
-
-      return newCommentary;
+      await new this.commentaryModel(payload).save();
     } catch (error) {
       console.warn(error);
       throw new BadRequestException('Ocurrió un error al crear el comentario.');

@@ -4,16 +4,39 @@ import { UpdateCommentaryDto } from './dto/update-commentary.dto';
 import { CommentaryDBRepository } from '../../driven-adapters/mongo-adapter/commentary/commentary.repository';
 import { QueryParamsDto } from '../common/dto/query-params.dto';
 import { ICommentaryDBRepository } from './commentary.repository.types';
+import { MailService } from 'src/infrastructure/driven-adapters/mail-adapter/service';
+import { ProjectService } from '../project/project.service';
+import { UserService } from '../auth/user.service';
 
 @Injectable()
 export class CommentaryService implements ICommentaryDBRepository {
-
   constructor(
     private readonly commentaryRepository: CommentaryDBRepository,
-  ){}
+    private readonly mailService: MailService,
+    private readonly projectService: ProjectService,
+    private readonly userService: UserService,
+  ) {}
 
-  create(createCommentaryDto: CreateCommentaryDto) {
-    return this.commentaryRepository.create(createCommentaryDto);
+  async create(createCommentaryDto: CreateCommentaryDto) {
+    await this.commentaryRepository.create(createCommentaryDto);
+
+    const project = await this.projectService.findById(
+      createCommentaryDto.projectId as any,
+    );
+
+    const authorProject = await this.userService.findById(
+      project.authorId as any,
+    );
+    const authorComment = await this.userService.findById(
+      createCommentaryDto.authorId as any,
+    );
+
+    await this.mailService.send({
+      project,
+      authorProject,
+      authorComment,
+      comment: createCommentaryDto,
+    });
   }
 
   findAllByProject(projectId: string, params: QueryParamsDto) {

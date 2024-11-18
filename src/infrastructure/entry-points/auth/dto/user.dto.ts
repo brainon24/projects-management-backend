@@ -7,11 +7,26 @@ import {
   IsEnum,
   IsNumber,
   IsPositive,
-  Length,
+  ValidatorConstraint,
+  ValidatorConstraintInterface,
+  Validate,
 } from 'class-validator';
 import { Schema } from 'mongoose';
 import { IUser } from '../../../../domain/common/user/user.interface';
 import { Role } from '../../../../domain/common/user/user-role.enum';
+
+@ValidatorConstraint({ name: 'isTenDigitNumber', async: false })
+export class IsTenDigitNumberConstraint
+  implements ValidatorConstraintInterface
+{
+  validate(phone: number) {
+    return phone.toString().length === 10;
+  }
+
+  defaultMessage() {
+    return 'El número de celular debe tener exactamente 10 dígitos.';
+  }
+}
 
 export class CreateUserDto implements IUser {
   @IsString()
@@ -20,7 +35,7 @@ export class CreateUserDto implements IUser {
 
   @IsNumber()
   @IsOptional()
-  @Length(10)
+  @Validate(IsTenDigitNumberConstraint)
   @IsPositive({
     message:
       'Ese no parece ser un número de celular válido, por favor ingrese uno válido.',
