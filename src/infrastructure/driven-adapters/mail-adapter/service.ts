@@ -25,15 +25,16 @@ export class MailService {
         from: this.MAIL_USER,
         // to: 'daviddiazlds1221@gmail.com',
         to: payload.authorProject.email,
-        subject: `Tenemos actualización en tu proyecto: ${payload.project.title}`,
+        subject: `Tenemos una nueva actualización en tu proyecto: ${payload.project.title}`,
         html: `Hola ${payload.authorProject.fullName},
 ${payload.authorComment.fullName} hizo una nueva actualización.
 <br />
 <p><strong>Actualización:</strong> ${payload.comment.commentary}</p>
 <br />
 <br />
-<center><p>Atentamente, el equipo de brainon24</p></center>
-<center><a href="https://www.linkedin.com/in/david-diaz-herrera-2777ba1a8/"><p>Desarrollado por David Diaz H.</p></a></center>
+<strong>Por favor no responder este correo ya que fue generado automáticamente</strong>
+<center><p>Atentamente, tú equipo de brainon24</p></center>
+<center><p>Desarrollo de brainon24</p><a href="https://www.linkedin.com/in/david-diaz-herrera-2777ba1a8/"><p> por David Diaz H.</p></a></center>
 `,
       });
     } catch (error) {
