@@ -23,7 +23,6 @@ export class MailService {
 
       await transporter.sendMail({
         from: this.MAIL_USER,
-        // to: 'daviddiazlds1221@gmail.com',
         to: payload.authorProject.email,
         subject: `Tenemos una nueva actualización en tu proyecto: ${payload.project.title}`,
         html: `Hola ${payload.authorProject.fullName},

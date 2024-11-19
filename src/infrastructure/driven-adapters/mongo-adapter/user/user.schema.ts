@@ -23,11 +23,11 @@ export class UserSpec extends Document implements IUser {
   fullName: string;
 
   @Prop({
-    type: Number,
-    required: false,
+    type: String,
+    required: true,
     trim: true,
   })
-  phone?: number; //TODO: Check it
+  phone?: string;
 
   @Prop({
     type: String,

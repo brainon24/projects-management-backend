@@ -1,35 +1,39 @@
-import { IsString, IsMongoId, IsEmail, IsNotEmpty, IsOptional, IsNumber } from 'class-validator';
+import {
+  IsString,
+  IsMongoId,
+  IsEmail,
+  IsNotEmpty,
+  IsOptional,
+} from 'class-validator';
 import { Schema } from 'mongoose';
 import { IUser } from './user.interface';
 import { Role } from './user-role.enum';
 
 export class UserDto implements IUser {
+  @IsString()
+  @IsNotEmpty()
+  fullName: string;
 
-    @IsString()
-    @IsNotEmpty()
-    fullName: string;
+  @IsString()
+  @IsNotEmpty()
+  phone?: string;
 
-    @IsNumber()
-    @IsOptional()
-    phone?: number;
+  @IsEmail()
+  @IsNotEmpty()
+  email: string;
 
-    @IsEmail()
-    @IsNotEmpty()
-    email: string;
+  @IsString()
+  @IsNotEmpty()
+  password: string;
 
-    @IsString()
-    @IsNotEmpty()
-    password: string;
+  @IsString()
+  @IsNotEmpty()
+  role: Role;
 
-    @IsString()
-    @IsNotEmpty()
-    role: Role;
+  @IsString()
+  @IsOptional()
+  profilePicture?: string;
 
-    @IsString()
-    @IsOptional()
-    profilePicture?: string;
-
-    @IsMongoId()
-    businessId: Schema.Types.ObjectId
-
+  @IsMongoId()
+  businessId: Schema.Types.ObjectId;
 }

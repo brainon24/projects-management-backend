@@ -4,7 +4,7 @@ import { Role } from './user-role.enum';
 export interface IUser {
   _id?: Schema.Types.ObjectId;
   fullName: string;
-  phone?: number;
+  phone?: string;
   email: string;
   password?: string;
   role: Role;
