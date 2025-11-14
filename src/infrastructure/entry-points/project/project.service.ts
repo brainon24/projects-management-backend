@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Inject, forwardRef } from '@nestjs/common';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { ProjectDBRepository } from '../../driven-adapters/mongo-adapter/project/project.repository';
@@ -6,10 +6,15 @@ import { IProjectDBRepository } from './project.repository.types';
 import { Project } from './entities/project.entity';
 import { QueryParamsDto } from '../common/dto/query-params.dto';
 import { PatchStatusDto } from './dto/patch-status.dto';
+import { CommentaryService } from '../commentary/commentary.service';
 
 @Injectable()
 export class ProjectService implements IProjectDBRepository {
-  constructor(private readonly projectRepository: ProjectDBRepository) {}
+  constructor(
+    private readonly projectRepository: ProjectDBRepository,
+    @Inject(forwardRef(() => CommentaryService))
+    private readonly commentaryService: CommentaryService
+  ) {}
 
   create(createProjectDto: CreateProjectDto) {
     return this.projectRepository.create(createProjectDto);
@@ -53,7 +58,9 @@ export class ProjectService implements IProjectDBRepository {
     return this.projectRepository.update(projectId, payload);
   }
 
-  remove(projectId: string): Promise<void> {
-    return this.projectRepository.remove(projectId);
+  async remove(projectId: string): Promise<void> {
+    await this.projectRepository.remove(projectId);
+    await this.commentaryService.removeByProjectId(projectId);
+    return;
   }
 }

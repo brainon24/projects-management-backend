@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Inject, forwardRef } from '@nestjs/common';
 import { CreateCommentaryDto } from './dto/create-commentary.dto';
 import { UpdateCommentaryDto } from './dto/update-commentary.dto';
 import { CommentaryDBRepository } from '../../driven-adapters/mongo-adapter/commentary/commentary.repository';
@@ -13,6 +13,7 @@ export class CommentaryService implements ICommentaryDBRepository {
   constructor(
     private readonly commentaryRepository: CommentaryDBRepository,
     private readonly mailService: MailService,
+    @Inject(forwardRef(() => ProjectService))
     private readonly projectService: ProjectService,
     private readonly userService: UserService,
   ) {}
@@ -49,5 +50,9 @@ export class CommentaryService implements ICommentaryDBRepository {
 
   remove(commentaryId: string) {
     return this.commentaryRepository.remove(commentaryId);
+  }
+
+  removeByProjectId(projectId: string) {
+    return this.commentaryRepository.removeByProjectId(projectId);
   }
 }

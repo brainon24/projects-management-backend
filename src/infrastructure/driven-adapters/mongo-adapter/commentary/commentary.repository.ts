@@ -136,4 +136,21 @@ export class CommentaryDBRepository implements ICommentaryDBRepository {
       throw new NotFoundException(error.message);
     }
   }
+
+  /**
+   * Remove Commentary
+   * @param projectId
+   * @return void
+   */
+  async removeByProjectId(projectId: string): Promise<void> {
+    try {
+      await this.commentaryModel.deleteMany({
+        projectId,
+      });
+      return;
+    } catch (error) {
+      console.warn(error);
+      throw new NotFoundException(error.message);
+    }
+  }
 }
