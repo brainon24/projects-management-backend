@@ -14,4 +14,5 @@ export abstract class ICommentaryDBRepository {
     payload: UpdateCommentaryDto,
   ): Promise<Commentary>;
   abstract remove(commentaryId: string): Promise<void>;
+  abstract removeByProjectId(projectId: string): Promise<void>;
 }
