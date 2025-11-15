@@ -318,6 +318,31 @@ export class UserDBRepository implements IUserDBRepository {
   }
 
   /**
+   * Update a User's password
+   * @params id, hashedPassword
+   * @return user password updated - Success confirmation
+   */
+  async updatePassword(id: string, hashedPassword: string): Promise<void> {
+    try {
+      const user = await this.userModel.findByIdAndUpdate(
+        { _id: id },
+        { password: hashedPassword },
+        { new: true },
+      );
+
+      if (!user) {
+        throw new NotFoundException(
+          'No se encontró ningún usuario por ese ID.',
+        );
+      }
+
+      return;
+    } catch (error) {
+      throw new NotFoundException('No se encontró ningún usuario por ese ID.');
+    }
+  }
+
+  /**
    * Delete a User
    * @params id
    * @return delete user - The user deleted

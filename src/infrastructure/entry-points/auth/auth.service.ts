@@ -1,9 +1,12 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, BadRequestException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UserDBRepository } from '../../driven-adapters/mongo-adapter/user/user.repository';
-import { LoginDto, signUpDto } from './dto/auth-dto';
+import { LoginDto, signUpDto, ForgotPasswordDto, ValidateResetTokenDto, ResetPasswordDto } from './dto/auth-dto';
 import { HashService } from '../../driven-adapters/hash-password-adapter/hash-password.service';
 import { BusinessService } from '../business/business.service';
+import { MailService } from '../../driven-adapters/mail-adapter/service';
+import { PasswordResetDBRepository } from '../../driven-adapters/mongo-adapter/password-reset/password-reset.repository';
+import * as crypto from 'crypto';
 
 @Injectable()
 export class AuthService {
@@ -11,8 +14,9 @@ export class AuthService {
     private readonly auth: UserDBRepository,
     private readonly hashService: HashService,
     private readonly jwtService: JwtService,
-
     private readonly businessService: BusinessService,
+    private readonly mailService: MailService,
+    private readonly passwordResetRepository: PasswordResetDBRepository,
   ) {}
 
   async signUp(payload: signUpDto): Promise<object | any> {
@@ -97,6 +101,191 @@ export class AuthService {
       throw new UnauthorizedException(
         'Se ha expirado tu sesión, por favor inicia sesión nuevamente.',
       );
+    }
+  }
+
+  async forgotPassword(payload: ForgotPasswordDto): Promise<object> {
+    try {
+      const { email } = payload;
+
+      // Verificar si el usuario existe
+      const user = await this.auth.findByEmail(email);
+      
+      if (!user) {
+        // Por seguridad, no revelamos si el email existe o no
+        return {
+          success: true,
+          message: 'Si el correo electrónico está registrado, recibirás las instrucciones para restablecer tu contraseña.',
+        };
+      }
+
+      // Generar un token único nuevo
+      const resetToken = crypto.randomBytes(32).toString('hex');
+      
+      // Crear el registro de reset (el repository elimina tokens anteriores del mismo usuario)
+      await this.passwordResetRepository.create({
+        token: resetToken,
+        userId: user._id,
+      });
+
+      // Enviar el correo de recuperación
+      await this.mailService.sendPasswordReset(email, user.fullName, resetToken);
+
+      return {
+        success: true,
+        message: 'Si el correo electrónico está registrado, recibirás las instrucciones para restablecer tu contraseña.',
+      };
+
+    } catch (error) {
+      console.error('Error en forgotPassword:', error);
+      
+      // Si el error es porque no se encontró el usuario, devolver el mismo mensaje genérico
+      if (error.message.includes('No se encontró ningún usuario')) {
+        return {
+          success: true,
+          message: 'Si el correo electrónico está registrado, recibirás las instrucciones para restablecer tu contraseña.',
+        };
+      }
+      
+      throw new BadRequestException(
+        'Error al procesar la solicitud de recuperación de contraseña. Inténtalo de nuevo más tarde.',
+      );
+    }
+  }
+
+  async validateResetToken(token: string): Promise<any> {
+    try {
+      const resetRecord = await this.passwordResetRepository.findByToken(token);
+      
+      // Obtener información del usuario
+      const user = await this.auth.findById((resetRecord?.userId as any)?._id);
+      
+      return {
+        valid: true,
+        userId: resetRecord.userId,
+        user: user,
+      };
+    } catch (error) {
+      throw new BadRequestException('Token de recuperación no válido o expirado.');
+    }
+  }
+
+  async consumeResetToken(token: string): Promise<void> {
+    try {
+      // Validar que el token existe antes de eliminarlo
+      await this.passwordResetRepository.findByToken(token);
+      
+      // Eliminar el token después de usarlo
+      await this.passwordResetRepository.deleteByToken(token);
+    } catch (error) {
+      throw new BadRequestException('Token de recuperación no válido o expirado.');
+    }
+  }
+
+  async validateResetTokenEndpoint(payload: ValidateResetTokenDto): Promise<object> {
+    try {
+      const { token } = payload;
+      
+      // Buscar directamente el token sin lanzar excepción
+      const resetRecord = await this.passwordResetRepository.findByTokenSafe(token);
+      
+      if (!resetRecord?.token) {
+        return {
+          valid: false,
+          message: 'Token de recuperación no válido o expirado.',
+        };
+      }
+
+      // Obtener información del usuario
+      const userId = (resetRecord?.userId as any)?._id;
+      const user = await this.auth.findById(userId);
+      
+      return {
+        valid: true,
+        message: 'Token válido',
+        userId: (resetRecord.userId as any)?._id,
+        email: user.email,
+      };
+    } catch (error) {
+      console.error('Error validando token:', error);
+      return {
+        valid: false,
+        message: 'Token de recuperación no válido o expirado.',
+      };
+    }
+  }
+
+  async resetPassword(payload: ResetPasswordDto): Promise<object> {
+    try {
+      const { token, newPassword } = payload;
+
+      // Validar el token y obtener el usuario
+      const tokenValidation = await this.validateResetToken(token);
+      const userId = tokenValidation.userId._id;
+
+      // Encriptar la nueva contraseña
+      const hashedPassword = await this.hashService.hash(newPassword);
+
+      // Actualizar la contraseña del usuario
+      await this.auth.updatePassword(userId, hashedPassword);
+
+      // Consumir el token (eliminarlo para que no se pueda reutilizar)
+      await this.consumeResetToken(token);
+
+      return {
+        success: true,
+        message: 'Contraseña actualizada correctamente.',
+      };
+
+    } catch (error) {
+      console.error('Error en resetPassword:', error);
+      
+      if (error.message.includes('Token de recuperación no válido')) {
+        throw new BadRequestException('Token de recuperación no válido o expirado.');
+      }
+
+      throw new BadRequestException(
+        'Error al actualizar la contraseña. Inténtalo de nuevo más tarde.',
+      );
+    }
+  }
+
+  async debugTokens(): Promise<object> {
+    try {
+      // Este método temporal para debuggear el TTL
+      const allTokens = await this.passwordResetRepository.getAllTokensForDebug();
+      
+      return {
+        totalTokens: allTokens.length,
+        tokens: allTokens.map(token => ({
+          token: token.token.substring(0, 10) + '...',
+          userId: token.userId,
+          createdAt: token.createdAt,
+          timeAgo: Math.floor((Date.now() - new Date(token.createdAt).getTime()) / 1000) + ' segundos',
+        })),
+        currentTime: new Date(),
+      };
+    } catch (error) {
+      return {
+        error: 'Error al obtener tokens para debug',
+        message: error.message,
+      };
+    }
+  }
+
+  async forceTTLIndex(): Promise<object> {
+    try {
+      await this.passwordResetRepository.ensureTTLIndex();
+      return {
+        success: true,
+        message: 'Índice TTL creado/actualizado correctamente',
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: 'Error al crear índice TTL',
+        message: error.message,
+      };
     }
   }
 }
