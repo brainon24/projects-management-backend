@@ -13,10 +13,9 @@ export class PasswordReset {
 
   @Prop({ 
     type: Date, 
-    default: Date.now,
-    expires: 20
+    expires: 15 * 60
   })
-  createdAt: Date;
+  expiresAt: Date;
 }
 
 export const PasswordResetSchema = SchemaFactory.createForClass(PasswordReset);

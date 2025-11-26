@@ -108,27 +108,21 @@ export class AuthService {
     try {
       const { email } = payload;
 
-      // Verificar si el usuario existe
       const user = await this.auth.findByEmail(email);
       
-      if (!user) {
-        // Por seguridad, no revelamos si el email existe o no
-        return {
-          success: true,
-          message: 'Si el correo electrónico está registrado, recibirás las instrucciones para restablecer tu contraseña.',
-        };
+      if (!user?._id) {
+        throw new BadRequestException(
+          'Parece que no hay ningún usuario registrado con ese correo electrónico.',
+        );
       }
 
-      // Generar un token único nuevo
-      const resetToken = crypto.randomBytes(32).toString('hex');
+      const resetToken = crypto?.randomBytes(32).toString('hex');
       
-      // Crear el registro de reset (el repository elimina tokens anteriores del mismo usuario)
       await this.passwordResetRepository.create({
         token: resetToken,
         userId: user._id,
       });
 
-      // Enviar el correo de recuperación
       await this.mailService.sendPasswordReset(email, user.fullName, resetToken);
 
       return {
@@ -137,16 +131,6 @@ export class AuthService {
       };
 
     } catch (error) {
-      console.error('Error en forgotPassword:', error);
-      
-      // Si el error es porque no se encontró el usuario, devolver el mismo mensaje genérico
-      if (error.message.includes('No se encontró ningún usuario')) {
-        return {
-          success: true,
-          message: 'Si el correo electrónico está registrado, recibirás las instrucciones para restablecer tu contraseña.',
-        };
-      }
-      
       throw new BadRequestException(
         'Error al procesar la solicitud de recuperación de contraseña. Inténtalo de nuevo más tarde.',
       );

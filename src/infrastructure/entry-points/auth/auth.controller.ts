@@ -29,7 +29,7 @@ export class AuthController {
     return this.authService.validateResetTokenEndpoint(payload);
   }
 
-  @Post('/reset-password')
+  @Post('/resetPassword')
   @HttpCode(200)
   resetPassword(@Body() payload: ResetPasswordDto) {
     return this.authService.resetPassword(payload);

@@ -19,10 +19,12 @@ export class PasswordResetDBRepository implements IPasswordResetDBRepository {
 
   async create(payload: CreatePasswordResetDto): Promise<IPasswordReset> {
     try {
-      // Eliminar tokens anteriores del mismo usuario antes de crear uno nuevo
       await this.deleteByUserId(payload.userId.toString());
       
-      const passwordReset = new this.passwordResetModel(payload);
+      const passwordReset = new this.passwordResetModel({
+        ...payload,
+        expiresAt: new Date(Date.now() + 1000 * 60 * 15),
+      });
       return await passwordReset.save();
     } catch (error) {
       // Si el error es por token duplicado, intentar eliminarlo y crear nuevamente
