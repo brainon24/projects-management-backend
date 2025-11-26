@@ -9,11 +9,13 @@ import { UserService } from './user.service';
 import { AuthController } from './auth.controller';
 import { UserController } from './user.controller';
 import { BusinessService } from '../business/business.service';
+import { MailModule } from 'src/infrastructure/driven-adapters/mail-adapter/module';
 
 @Module({
   imports: [
     PassportModule,
     ConfigModule,
+    MailModule,
 
     PassportModule.register({ defaultStrategy: 'jwt' }),
 

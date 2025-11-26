@@ -63,6 +63,12 @@ export class UserController implements IUserDBRepository {
     return this.userService.updateRole(_id, role);
   }
 
+  @Patch('/updatePassword/:id')
+  updatePassword(@Param('id') id: string, @Body() payload: any) {
+    const { hashedPassword } = payload;
+    return this.userService.updatePassword(id, hashedPassword);
+  }
+
   @Delete('/delete/:id')
   delete(@Param('id') id: string) {
     return this.userService.delete(id);

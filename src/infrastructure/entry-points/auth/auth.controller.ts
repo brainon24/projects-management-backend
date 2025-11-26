@@ -1,7 +1,7 @@
-import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Req, UseGuards, Param, HttpCode } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from './auth.service';
-import { signUpDto, LoginDto } from './dto/auth-dto';
+import { signUpDto, LoginDto, ForgotPasswordDto, ValidateResetTokenDto, ResetPasswordDto } from './dto/auth-dto';
 
 @Controller('/auth')
 export class AuthController {
@@ -15,6 +15,36 @@ export class AuthController {
   @Post('/login')
   login(@Body() payload: LoginDto) {
     return this.authService.login(payload);
+  }
+
+  @Post('/forgotPassword')
+  @HttpCode(200)
+  forgotPassword(@Body() payload: ForgotPasswordDto) {
+    return this.authService.forgotPassword(payload);
+  }
+
+  @Post('/validateToken')
+  @HttpCode(200)
+  validateResetToken(@Body() payload: ValidateResetTokenDto) {
+    return this.authService.validateResetTokenEndpoint(payload);
+  }
+
+  @Post('/resetPassword')
+  @HttpCode(200)
+  resetPassword(@Body() payload: ResetPasswordDto) {
+    return this.authService.resetPassword(payload);
+  }
+
+  @Get('/debug-tokens')
+  @HttpCode(200)
+  debugTokens() {
+    return this.authService.debugTokens();
+  }
+
+  @Post('/force-ttl-index')
+  @HttpCode(200)
+  forceTTLIndex() {
+    return this.authService.forceTTLIndex();
   }
 
   @Get('/checkToken')

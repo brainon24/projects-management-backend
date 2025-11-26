@@ -20,3 +20,31 @@ export class LoginDto implements ILogin {
 }
 
 export class signUpDto extends CreateUserDto implements IUser {}
+
+export class ForgotPasswordDto {
+  @IsEmail(
+    {},
+    {
+      message:
+        'Ese no parece ser un email válido, por favor ingrese uno válido.',
+    },
+  )
+  @IsNotEmpty()
+  email: string;
+}
+
+export class ValidateResetTokenDto {
+  @IsString()
+  @IsNotEmpty()
+  token: string;
+}
+
+export class ResetPasswordDto {
+  @IsString()
+  @IsNotEmpty()
+  token: string;
+
+  @IsString()
+  @IsNotEmpty()
+  newPassword: string;
+}

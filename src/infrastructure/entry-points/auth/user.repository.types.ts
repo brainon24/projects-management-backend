@@ -9,5 +9,6 @@ export abstract class IUserDBRepository {
     abstract findAll(): Promise<User[]>;
     abstract findAllByRole(role: string): Promise<User | User[]>;
     abstract updateRole(id: string, role: string): Promise<User>;
+    abstract updatePassword(id: string, hashedPassword: string): Promise<void>;
     abstract delete(id: string): Promise<void>;
 }

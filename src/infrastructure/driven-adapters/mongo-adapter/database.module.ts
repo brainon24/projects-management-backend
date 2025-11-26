@@ -12,6 +12,8 @@ import { CommentarySchema } from './commentary/commentary.schema';
 import { CommentaryDBRepository } from './commentary/commentary.repository';
 import { MessageSchema } from './message/message.schema';
 import { MessageDBRepository } from './message/message.repository';
+import { PasswordResetSchema } from './password-reset/password-reset.schema';
+import { PasswordResetDBRepository } from './password-reset/password-reset.repository';
 
 @Global()
 @Module({
@@ -45,6 +47,10 @@ import { MessageDBRepository } from './message/message.repository';
         name: 'Message',
         schema: MessageSchema,
       },
+      {
+        name: 'PasswordReset',
+        schema: PasswordResetSchema,
+      },
     ]),
   ],
   providers: [
@@ -53,6 +59,7 @@ import { MessageDBRepository } from './message/message.repository';
     ProjectDBRepository,
     CommentaryDBRepository,
     MessageDBRepository,
+    PasswordResetDBRepository,
   ],
   exports: [
     MongooseModule,
@@ -61,6 +68,7 @@ import { MessageDBRepository } from './message/message.repository';
     ProjectDBRepository,
     CommentaryDBRepository,
     MessageDBRepository,
+    PasswordResetDBRepository,
   ],
 })
 export class DatabaseModule {}
