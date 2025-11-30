@@ -31,7 +31,6 @@ export class MessageSpec extends Document implements IMessage {
   @Prop({
     type: String,
     require: false,
-    trim: true,
   })
   attachment: string;
   @Prop({
