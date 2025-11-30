@@ -23,7 +23,7 @@ export class MessageDBRepository implements IMessageDBRepository {
   async findAllByUserId(userId: string): Promise<IMessage[]> {
     try {
       const messages = await this.model.find({ userId }).sort({
-        createdAt: -1,
+        createdAt: 1,
       });
 
       return messages;

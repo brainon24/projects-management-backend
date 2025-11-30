@@ -12,8 +12,8 @@ export class PasswordReset {
   userId: MongooseSchema.Types.ObjectId;
 
   @Prop({ 
-    type: Date, 
-    expires: 15 * 60
+    type: Date,
+    required: true
   })
   expiresAt: Date;
 }

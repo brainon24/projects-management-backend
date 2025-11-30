@@ -17,6 +17,10 @@ export class PasswordResetDBRepository implements IPasswordResetDBRepository {
     private passwordResetModel: Model<PasswordResetSpec>,
   ) {}
 
+  async onModuleInit() {
+    await this.ensureTTLIndex();
+  }
+
   async create(payload: CreatePasswordResetDto): Promise<IPasswordReset> {
     try {
       await this.deleteByUserId(payload.userId.toString());
@@ -108,15 +112,31 @@ export class PasswordResetDBRepository implements IPasswordResetDBRepository {
   async ensureTTLIndex(): Promise<void> {
     try {
       // Verificar índices existentes
-      const indexes = await this.passwordResetModel.collection.getIndexes();
-      console.log('Índices existentes en passwordresets:', indexes);
+      const indexes: any = await this.passwordResetModel.collection.getIndexes();
 
-      // Crear/recrear el índice TTL
+      // Eliminar TODOS los índices TTL antiguos que puedan estar conflictuando
+      const indexNames = Object.keys(indexes);
+      for (const indexName of indexNames) {
+        // No eliminar el índice de _id ni el de token
+        if (indexName !== '_id_' && indexName !== 'token_1') {
+          try {
+            await this.passwordResetModel.collection.dropIndex(indexName);
+            console.log(`Índice ${indexName} eliminado`);
+          } catch (error: any) {
+            console.log(`No se pudo eliminar índice ${indexName}:`, error.message);
+          }
+        }
+      }
+
+      // Crear el índice TTL correcto - expireAfterSeconds: 0 significa que expira EN la fecha de expiresAt
       await this.passwordResetModel.collection.createIndex(
-        { createdAt: 1 },
-        { expireAfterSeconds: 20, background: true }
+        { expiresAt: 1 },
+        { expireAfterSeconds: 0, background: true }
       );
-      console.log('Índice TTL creado/actualizado correctamente');
+      
+      // Verificar índices después de la operación
+      const newIndexes = await this.passwordResetModel.collection.getIndexes();
+      console.log('Índices después de la actualización:', newIndexes);
     } catch (error) {
       console.error('Error creando índice TTL:', error);
     }

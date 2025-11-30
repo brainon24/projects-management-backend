@@ -141,7 +141,6 @@ export class AuthService {
     try {
       const resetRecord = await this.passwordResetRepository.findByToken(token);
       
-      // Obtener información del usuario
       const user = await this.auth.findById((resetRecord?.userId as any)?._id);
       
       return {
@@ -156,10 +155,8 @@ export class AuthService {
 
   async consumeResetToken(token: string): Promise<void> {
     try {
-      // Validar que el token existe antes de eliminarlo
       await this.passwordResetRepository.findByToken(token);
       
-      // Eliminar el token después de usarlo
       await this.passwordResetRepository.deleteByToken(token);
     } catch (error) {
       throw new BadRequestException('Token de recuperación no válido o expirado.');
@@ -170,7 +167,6 @@ export class AuthService {
     try {
       const { token } = payload;
       
-      // Buscar directamente el token sin lanzar excepción
       const resetRecord = await this.passwordResetRepository.findByTokenSafe(token);
       
       if (!resetRecord?.token) {
@@ -180,7 +176,6 @@ export class AuthService {
         };
       }
 
-      // Obtener información del usuario
       const userId = (resetRecord?.userId as any)?._id;
       const user = await this.auth.findById(userId);
       
@@ -203,17 +198,13 @@ export class AuthService {
     try {
       const { token, newPassword } = payload;
 
-      // Validar el token y obtener el usuario
       const tokenValidation = await this.validateResetToken(token);
       const userId = tokenValidation.userId._id;
 
-      // Encriptar la nueva contraseña
       const hashedPassword = await this.hashService.hash(newPassword);
 
-      // Actualizar la contraseña del usuario
       await this.auth.updatePassword(userId, hashedPassword);
 
-      // Consumir el token (eliminarlo para que no se pueda reutilizar)
       await this.consumeResetToken(token);
 
       return {
@@ -236,7 +227,6 @@ export class AuthService {
 
   async debugTokens(): Promise<object> {
     try {
-      // Este método temporal para debuggear el TTL
       const allTokens = await this.passwordResetRepository.getAllTokensForDebug();
       
       return {
