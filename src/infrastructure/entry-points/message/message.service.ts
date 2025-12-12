@@ -11,8 +11,8 @@ export class MessageService implements IMessageDBRepository {
     return this.repository.create(payload);
   }
 
-  findAllByUserId(userId: any) {
-    return this.repository.findAllByUserId(userId);
+  findAllByConversationId(conversationId: any) {
+    return this.repository.findAllByConversationId(conversationId);
   }
 
   remove(messageId: string): Promise<void> {

@@ -12,9 +12,9 @@ export class MessageController implements IMessageDBRepository {
     return this.service.create(payload);
   }
 
-  @Get('/findAll/:userId')
-  findAllByUserId(@Param('userId') userId: string) {
-    return this.service.findAllByUserId(userId);
+  @Get('/findAll/:conversationId')
+  findAllByConversationId(@Param('conversationId') conversationId: string) {
+    return this.service.findAllByConversationId(conversationId);
   }
 
   @Delete('/remove/:messageId')

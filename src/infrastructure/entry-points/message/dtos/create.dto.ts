@@ -4,7 +4,11 @@ import { IMessage } from 'src/domain/common/message/message.interface';
 export class CreateMessageDto implements IMessage {
   @IsNotEmpty()
   @IsMongoId()
-  userId: any;
+  conversationId: any;
+
+  @IsNotEmpty()
+  @IsMongoId()
+  author: any;
 
   @IsOptional()
   @IsString()

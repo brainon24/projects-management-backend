@@ -21,7 +21,14 @@ export class MessageSpec extends Document implements IMessage {
     trim: true,
     ref: 'User',
   })
-  userId: any;
+  conversationId: any;
+  @Prop({
+    type: Types.ObjectId,
+    require: true,
+    trim: true,
+    ref: 'User',
+  })
+  author: any;
   @Prop({
     type: String,
     require: false,

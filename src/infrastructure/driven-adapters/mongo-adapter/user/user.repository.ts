@@ -187,9 +187,9 @@ export class UserDBRepository implements IUserDBRepository {
     try {
       const user: any = await this.userModel.findOne({ phone });
 
-      if (!user) {
+      if (!user?._id) {
         throw new NotFoundException(
-          'No se encontró ningún usuario por ese correo electrónico.',
+          'No se encontró ningún usuario por ese telefono.',
         );
       }
 
@@ -202,7 +202,7 @@ export class UserDBRepository implements IUserDBRepository {
       return newObjectUser;
     } catch (error) {
       throw new NotFoundException(
-        'No se encontró ningún usuario por ese correo electrónico.',
+        'No se encontró ningún usuario por ese telefono.',
       );
     }
   }
