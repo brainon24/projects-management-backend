@@ -8,21 +8,23 @@ import { IMessage } from 'src/domain/common/message/message.interface';
 export class MessageDBRepository implements IMessageDBRepository {
   constructor(@InjectModel('Message') private model: Model<MessageSpec>) {}
 
-  async create(payload: IMessage): Promise<void> {
+  async create(payload: IMessage): Promise<any> {
     try {
       const create = await this.model.create(payload);
 
       if (!create) {
         throw new BadRequestException('Error al crear al guardar el mensaje.');
       }
+
+      return create;
     } catch (error) {
       throw new BadRequestException('Error al crear al guardar el mensaje.');
     }
   }
 
-  async findAllByUserId(userId: string): Promise<IMessage[]> {
+  async findAllByConversationId(conversationId: string): Promise<IMessage[]> {
     try {
-      const messages = await this.model.find({ userId }).sort({
+      const messages = await this.model.find({ conversationId }).sort({
         createdAt: 1,
       });
 

@@ -1,6 +1,7 @@
 export interface IMessage {
   _id?: any;
-  userId: any;
+  conversationId: any;
+  author: any;
   content: string;
   attachment: string;
   attachmentType: string;
